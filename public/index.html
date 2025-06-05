@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หลักสูตรอบรม Safety Station</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4A90E2 0%, #2B5FB7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .safety-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4A90E2 0%, #FF6B35 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #FF6B35;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            background: #f8fafc;
+            border: 2px solid #e1e5e9;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+        
+        .filter-tab.active {
+            background: #4A90E2;
+            color: white;
+            border-color: #4A90E2;
+        }
+        
+        .filter-tab:hover:not(.active) {
+            background: #e2e8f0;
+        }
+        
+        .courses-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .course-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #FF6B35;
+            transition: all 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .course-header {
+            margin-bottom: 12px;
+        }
+        
+        .course-type {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .course-name {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .course-subtype {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .course-date {
+            color: #4A90E2;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .course-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .btn-detail {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-detail:hover {
+            background: #cbd5e1;
+        }
+        
+        .btn-apply {
+            background: linear-gradient(135deg, #4A90E2 0%, #FF6B35 100%);
+            color: white;
+        }
+        
+        .btn-apply:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FF6B35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-info {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4A90E2;
+        }
+        
+        .stats-text {
+            font-size: 13px;
+            color: #1e40af;
+            font-weight: 500;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .filter-tabs {
+                margin-bottom: 15px;
+            }
+            
+            .course-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="safety-badge">🛡️ SAFETY STATION</div>
+            <h1>📚 หลักสูตรอบรม</h1>
+            <p>เลือกหลักสูตรที่ต้องการเรียน</p>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาหลักสูตร...">
+            <button id="searchBtn" class="search-btn">🔍</button>
+        </div>
+        
+        <div id="statsInfo" class="stats-info" style="display: none;">
+            <div class="stats-text" id="statsText">กำลังโหลดข้อมูล...</div>
+        </div>
+        
+        <div class="filter-tabs" id="filterTabs">
+            <div class="filter-tab active" data-type="all">ทั้งหมด</div>
+        </div>
+        
+        <div id="loadingState" class="loading">
+            <div class="loading-spinner"></div>
+            <div>กำลังโหลดหลักสูตร...</div>
+        </div>
+        
+        <div id="errorState" class="error-message" style="display: none;"></div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📭</div>
+            <div>ไม่พบหลักสูตรที่ค้นหา</div>
+        </div>
+        
+        <div id="coursesList" class="courses-list" style="display: none;"></div>
+    </div>
+
+    <script>
+        class CourseCatalog {
+            constructor() {
+                this.apiBase = 'https://your-app-name.up.railway.app/api'; // เปลี่ยนเป็น URL จริง
+                this.allCourses = [];
+                this.filteredCourses = [];
+                this.currentFilter = 'all';
+                this.courseTypes = [];
+                this.init();
+            }
+            
+            async init() {
+                // Initialize LIFF
+                try {
+                    await liff.init({ liffId: 'YOUR_LIFF_ID' });
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('LIFF init failed:', error);
+                    // Continue without LIFF for testing
+                }
+                
+                this.setupEventListeners();
+                await this.loadData();
+            }
+            
+            setupEventListeners() {
+                // Search functionality
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.searchCourses(e.target.value);
+                });
+                
+                document.getElementById('searchBtn').addEventListener('click', () => {
+                    const query = document.getElementById('searchInput').value;
+                    this.searchCourses(query);
+                });
+                
+                // Filter tabs
+                document.getElementById('filterTabs').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-tab')) {
+                        this.setActiveFilter(e.target.dataset.type);
+                    }
+                });
+            }
+            
+            async loadData() {
+                try {
+                    this.showLoading();
+                    
+                    // Load courses and course types
+                    const [coursesResponse, typesResponse, statsResponse] = await Promise.all([
+                        fetch(`${this.apiBase}/courses`),
+                        fetch(`${this.apiBase}/course-types`),
+                        fetch(`${this.apiBase}/stats`)
+                    ]);
+                    
+                    if (!coursesResponse.ok || !typesResponse.ok) {
+                        throw new Error('Failed to fetch data');
+                    }
+                    
+                    this.allCourses = await coursesResponse.json();
+                    this.courseTypes = await typesResponse.json();
+                    
+                    if (statsResponse.ok) {
+                        const stats = await statsResponse.json();
+                        this.showStats(stats);
+                    }
+                    
+                    this.setupFilterTabs();
+                    this.filterCourses();
+                    this.hideLoading();
+                    
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    this.showError('ไม่สามารถโหลดข้อมูลหลักสูตรได้ กรุณาลองใหม่อีกครั้ง');
+                    this.hideLoading();
+                }
+            }
+            
+            setupFilterTabs() {
+                const filterTabs = document.getElementById('filterTabs');
+                
+                // Clear existing tabs except "ทั้งหมด"
+                filterTabs.innerHTML = '<div class="filter-tab active" data-type="all">ทั้งหมด</div>';
+                
+                // Add course type tabs
+                this.courseTypes.forEach(type => {
+                    const tab = document.createElement('div');
+                    tab.className = 'filter-tab';
+                    tab.dataset.type = type;
+                    tab.textContent = type;
+                    filterTabs.appendChild(tab);
+                });
+            }
+            
+            setActiveFilter(type) {
+                // Update active tab
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-type="${type}"]`).classList.add('active');
+                
+                this.currentFilter = type;
+                this.filterCourses();
+            }
+            
+            filterCourses() {
+                if (this.currentFilter === 'all') {
+                    this.filteredCourses = [...this.allCourses];
+                } else {
+                    this.filteredCourses = this.allCourses.filter(course => 
+                        course.course_type === this.currentFilter
+                    );
+                }
+                
+                this.renderCourses();
+            }
+            
+            async searchCourses(query) {
+                if (!query.trim()) {
+                    this.filterCourses();
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiBase}/search?q=${encodeURIComponent(query)}`);
+                    if (!response.ok) throw new Error('Search failed');
+                    
+                    const searchResults = await response.json();
+                    this.filteredCourses = searchResults;
+                    this.renderCourses();
+                    
+                } catch (error) {
+                    console.error('Search error:', error);
+                    this.showError('เกิดข้อผิดพลาดในการค้นหา');
+                }
+            }
+            
+            renderCourses() {
+                const coursesList = document.getElementById('coursesList');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (this.filteredCourses.length === 0) {
+                    coursesList.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                coursesList.style.display = 'block';
+                
+                coursesList.innerHTML = this.filteredCourses.map(course => `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <div class="course-type">${course.course_type}</div>
+                            <div class="course-name">${course.course_name}</div>
+                            <div class="course-subtype">${course.course_subtype}</div>
+                        </div>
+                        <div class="course-date">
+                            📅 ${course.course_date}
+                        </div>
+                        <div class="course-actions">
+                            <a href="${course.course_detail}" target="_blank" class="btn btn-detail">
+                                📋 รายละเอียด
+                            </a>
+                            <a href="${course.course_apply}" target="_blank" class="btn btn-apply">
+                                ✅ ลงทะเบียน
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            showStats(stats) {
+                const statsInfo = document.getElementById('statsInfo');
+                const statsText = document.getElementById('statsText');
+                
+                statsText.textContent = `📊 มีหลักสูตรทั้งหมด ${stats.totalCourses} หลักสูตร`;
+                statsInfo.style.display = 'block';
+            }
+            
+            showLoading() {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('coursesList').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'none';
+            }
+            
+            hideLoading() {
+                document.getElementById('loadingState').style.display = 'none';
+            }
+            
+            showError(message) {
+                const errorState = document.getElementById('errorState');
+                errorState.textContent = message;
+                errorState.style.display = 'block';
+                document.getElementById('coursesList').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new CourseCatalog();
+        });
+    </script>
+</body>
+</html>
